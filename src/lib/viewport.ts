@@ -75,7 +75,9 @@ const syncKeyboard = (): void => {
       root.style.setProperty("--app-height", `${Math.round(window.screen.height)}px`);
     else root.style.removeProperty("--app-height");
   }
-  if (document.querySelector(".app") !== null) window.scrollTo(0, 0);
+  // A field focused while the keyboard is not confirmed keeps iOS's own scroll, which reveals it:
+  // pinning then would leave the composer under a keyboard this guess missed (Theodore fork).
+  if (document.querySelector(".app") !== null && (visible || !focused)) window.scrollTo(0, 0);
 };
 viewport?.addEventListener("resize", syncKeyboard);
 viewport?.addEventListener("scroll", syncKeyboard);

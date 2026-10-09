@@ -44,6 +44,7 @@ import {
 import { ensurePushSubscription, pushSupported, removePushSubscription } from "./lib/push.ts";
 import { notificationTargetFromSearch, notificationViewForPane, onNotificationTarget, type NotificationTarget } from "./lib/notificationTarget.ts";
 import { useUpdates } from "./lib/updates.ts";
+import { IN_THEODORE } from "./lib/theodore.ts";
 import { UpdateNotice } from "./components/UpdateControls.tsx";
 import { TelemetryNotice } from "./components/TelemetryControls.tsx";
 import { FilesDialog } from "./components/FilesDialog.tsx";
@@ -894,7 +895,8 @@ export function App() {
         <OpenFileContext.Provider value={selectedPaneId !== null ? viewFile : null}>
         <div className={`pane-column${chatShown ? " is-chat" : ""}`}>
         {/* over the pane only: a bar across the window would cut the sidebar off from its top row in the header */}
-        <UpdateNotice updates={updates} onOpen={() => { setSettingsSection("updates"); setSettingsOpen(true); }} />
+        {/* Theodore fork: Theodore pins this server's version, so no update line */}
+        {!IN_THEODORE && <UpdateNotice updates={updates} onOpen={() => { setSettingsSection("updates"); setSettingsOpen(true); }} />}
         <TelemetryNotice enabled={locked === false} onOpen={() => { setSettingsSection("updates"); setSettingsOpen(true); }} />
         <MachineActionBanner machines={machines} onSetup={(machine, update = false) => { setDrawerOpen(false); setUpdateRemote(update); setMachineDialog(machine); }} />
         {snapshot && selectedPane && selectedWorkspace && (

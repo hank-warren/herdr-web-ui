@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode, type RefObject } from "react";
+import { IN_THEODORE } from "../lib/theodore.ts";
 import { ArrowLeft, Bell, ChevronDown, ChevronRight, ChevronUp, Eye, EyeOff, Gauge, Info, Keyboard, MessageSquare, Mic, Monitor, Palette, Plus, Smartphone, SquareTerminal, Star, X, type LucideIcon } from "lucide-react";
 
 import "./SettingsDialog.css";
@@ -583,7 +584,8 @@ function AboutPage({ updates, herdrVersion, bridgesFollow }: { updates: UpdatesM
   const t = useT();
   return (
     <>
-      <UpdateControls updates={updates} bridgesFollow={bridgesFollow} />
+      {/* Theodore fork: Theodore's pin updates this server, together with this client */}
+      {!IN_THEODORE && <UpdateControls updates={updates} bridgesFollow={bridgesFollow} />}
       <HerdrUpdateControls enabled herdrVersion={herdrVersion} />
       <TelemetryControls />
       <SettingsGroup title={t("About")} className="settings-about">
