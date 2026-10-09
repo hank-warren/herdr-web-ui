@@ -1,0 +1,24 @@
+/* Theodore fork: its pages, a row of four above Settings */
+.theodore-links {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-1);
+  margin-bottom: var(--space-1);
+  padding-bottom: var(--space-1);
+  border-bottom: 1px solid var(--border);
+}
+
+.theodore-link.sidebar-footer-action {
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  height: auto;
+  padding: var(--space-1) 0;
+  font-size: var(--fs-sm);
+  text-decoration: none;
+  color: var(--text-dim);
+}
+
+.theodore-link.sidebar-footer-action svg {
+  margin-inline: 0;
+}

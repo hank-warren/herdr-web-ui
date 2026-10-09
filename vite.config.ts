@@ -18,10 +18,43 @@ const thirdPartyNotices: Plugin = {
   },
 };
 
+// Theodore (github.com/hank-warren/theodore) serves this client under a path prefix,
+// HERDR_WEB_BASE=/herdr/, and proxies <base>api/ and <base>ws to this server. The client's own
+// root-relative URLs are rewritten at build time so the source stays upstream's.
+const base = process.env["HERDR_WEB_BASE"] ?? "/";
+if (!/^\/([\w-]+\/)*$/.test(base)) throw new Error(`HERDR_WEB_BASE must be a path ending in /, not ${base}`);
+const underBase: Plugin = {
+  name: "under-base",
+  enforce: "pre",
+  transform(code, id) {
+    if (base === "/" || !/\/(src|shared)\/[^?]*\.tsx?$/.test(id)) return null;
+    return code
+      .replaceAll('"/api/', `"${base}api/`)
+      .replaceAll("`/api/", `\`${base}api/`)
+      .replaceAll('"/icons/', `"${base}icons/`)
+      .replaceAll("${window.location.host}/ws", `\${window.location.host}${base}ws`);
+  },
+  // Theodore owns the installed app: no service worker of this client's (before Vite bundles the
+  // page's scripts, so pwa.ts is left out) and Theodore's manifest (after Vite prefixes the base).
+  transformIndexHtml: {
+    order: "pre",
+    handler: (html) => (base === "/" ? html : html.replace(/<script type="module" src="\/src\/pwa\.ts"><\/script>\s*/, "")),
+  },
+};
+const theodoreManifest: Plugin = {
+  name: "theodore-manifest",
+  transformIndexHtml: {
+    order: "post",
+    handler: (html) => (base === "/" ? html : html.replace(/<link rel="manifest"[^>]*>/, '<link rel="manifest" href="/manifest.webmanifest" />')),
+  },
+};
+
 export default defineConfig({
-  plugins: [react(), thirdPartyNotices],
+  base,
+  plugins: [underBase, theodoreManifest, react(), thirdPartyNotices],
   define: {
     __APP_REVISION__: JSON.stringify(revision),
+    __THEODORE__: JSON.stringify(base !== "/"),
     __APP_VERSION__: JSON.stringify((JSON.parse(readFileSync("package.json", "utf8")) as { version: string }).version),
   },
   server: {
